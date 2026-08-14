@@ -1,0 +1,33 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Python / tooling
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Local secrets/config
+.env
+.env.*
+!.env.example
+*.secret
+secrets/
+
+# MCP/local runtime
+.mcp-local/
+.cache/
+
+# Generated printer artifacts
+*.gcode
+*.gco
+*.bgcode
+
+# Temporary slicer/export files
+*.tmp
+*.bak
+*.autosave
+
+# Keep editable CAD, 3MF, STL, STEP, renders and manifests unless a project-specific rule says otherwise.
