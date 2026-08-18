@@ -28,6 +28,44 @@ Goal: complete one reproducible, approved print on Centauri Carbon 2.
 
 Exit: `prompt -> editable CAD -> preview -> STL/STEP -> slice -> review -> human approval -> upload/start -> monitor -> result` works without manual file shuffling.
 
+## Phase 1.25 — multi-slicer routing and competitive slicing
+
+Goal: choose the best slicer and slicing strategy for each job instead of permanently binding the pipeline to one backend.
+
+The LLM/Codex provides intent and may explain the decision, but slicer selection itself must be deterministic, reproducible and policy-driven.
+
+1. Separate `slice` from `send-to-printer`; printer transport/control must not determine which slicer is used.
+2. Implement a `Slicer Router` with hard capability constraints first, then weighted scoring.
+3. Track versioned slicer capabilities and printer/profile compatibility rather than relying on model memory.
+4. Provide initial adapters for:
+   - ElegooSlicer;
+   - OrcaSlicer;
+   - PrusaSlicer;
+   - CuraEngine.
+5. Score candidates using at least:
+   - printer/profile compatibility;
+   - multicolor/CANVAS compatibility;
+   - headless/automation reliability;
+   - expected surface quality;
+   - support strategy;
+   - dimensional accuracy;
+   - speed;
+   - filament consumption;
+   - purge/waste efficiency;
+   - profile confidence.
+6. Add competitive slicing: when top candidates are sufficiently close, slice the same job with multiple backends instead of choosing from policy alone.
+7. Build a result analyzer that normalizes slicer outputs into comparable metrics, including estimated time, model/support/purge filament, color/tool changes and other available G-code statistics.
+8. Keep slicer versions, profiles, router policy and scoring weights version-controlled so every decision can be reproduced.
+9. Use the first multicolor benchmark scenario to validate the router on the real CC2 Combo:
+   - four identical 4-color Minions in one job;
+   - compare four standing on their feet versus four lying on their backs;
+   - compare at least ElegooSlicer and OrcaSlicer;
+   - record time, total filament, purge/waste, support material and color changes;
+   - select the winner from declared priorities plus measured slice results, not from a hard-coded preferred slicer.
+10. Persist the chosen strategy and all candidate summaries in the print manifest for later physical-result correlation.
+
+Exit: for a supported job, Codex can request a slicing strategy without naming a slicer; the router selects or competitively evaluates backends, explains the measurable trade-off, and produces a reproducible approved artifact for the existing Phase-1 print pipeline.
+
 ## Phase 1.5 — feedback and observability
 
 - spool inventory and estimated remaining material;
@@ -35,7 +73,9 @@ Exit: `prompt -> editable CAD -> preview -> STL/STEP -> slice -> review -> human
 - camera sampling and visual anomaly analysis;
 - first-layer/spaghetti/detachment detection as advisory signals;
 - structured print-result feedback;
-- empirical dimensional clearances for this exact printer/material/profile combination.
+- empirical dimensional clearances for this exact printer/material/profile combination;
+- correlate physical print outcomes with slicer, slicer version, profile, orientation and router decision;
+- use accumulated local evidence to tune router weights/policies, while keeping policy changes explicit and version-controlled.
 
 Autonomous control remains conservative; monitoring recommends pause/stop until sufficient local evidence exists.
 
